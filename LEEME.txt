@@ -35,17 +35,45 @@ SÍ se comparte es la base de datos, que es lo que él escogió: un proyecto de
 Supabase aparte serían otras llaves y otra cuenta que mantener.
 
 
+VER LA LISTA DE CONFIRMADOS
+---------------------------
+    https://cci-iberotj.github.io/intersuj/lista/
+
+Se entra con la MISMA cuenta de LA PIZARRA (correo y contraseña), porque es
+la misma base. La sesión se queda guardada en ese navegador, así que sólo se
+escribe una vez; se cierra con "Salir".
+
+Qué trae:
+  · los números de arriba: apuntados, ya grabados, faltan, y cuántos dijeron
+    que pueden moverse de día
+  · la gente agrupada POR DÍA, en el orden en que se apuntó
+  · una palomita por persona para marcar "ya lo grabamos". Se pinta al
+    momento y se guarda; si la base no lo acepta, se regresa como estaba y
+    lo dice — más vale eso que una palomita puesta que no se guardó
+  · botones de WhatsApp y correo de cada quien, para avisarle sin copiar
+    nada a mano. El teléfono se guarda como lo escriban; para el enlace se
+    dejan sólo los dígitos y se le pone el 52 si vino sin lada de país
+  · buscador por nombre o equipo, que no se pelea con los acentos
+  · "Bajar lista (CSV)" para abrirla en Excel o imprimirla. Va con punto y
+    coma y con BOM, que es lo que el Excel en español entiende sin que haya
+    que importar nada a mano
+
+La página lleva `noindex` y NO enseña nada sin sesión: la regla de la tabla
+deja escribir a cualquiera —ahí se apuntan los atletas— pero leer sólo a
+quien entró. Quien la abra sin cuenta ve la caja de entrar y ya.
+
+Si alguna vez hace falta a mano, la consulta de siempre:
+
+    cd "...\LA PIZARRA"
+    (un .sql con)  select * from public.grabaciones_intersuj order by dia_fecha, creado;
+    python supabase/correr.py ese.sql
+
+
 DÓNDE CAEN LAS RESPUESTAS
 -------------------------
 En Supabase, tabla `grabaciones_intersuj`, la misma base de LA PIZARRA.
 El SQL que la crea vive en LA PIZARRA\supabase\grabaciones_intersuj.sql y
 se puede volver a correr sin miedo.
-
-Para verlas, mientras no haya pantalla en LA PIZARRA:
-
-    cd "...\LA PIZARRA"
-    (un .sql con)  select * from public.grabaciones_intersuj order by dia_fecha, creado;
-    python supabase/correr.py ese.sql
 
 EL PERMISO VA AL REVÉS QUE EN EL RESTO DE LA PIZARRA
 Quien se apunta es un alumno con un navegador: no tiene cuenta y no debe
@@ -91,7 +119,8 @@ congelada en el primer cuadro.
 
 QUÉ HAY AQUÍ
 ------------
-index.html    Todo: los días, el formulario y el envío.
+index.html    El formulario: los días, los campos y el envío.
+lista/        La pantalla para ver quién se apuntó y palomear quién llegó.
 assets/       Banner, póster y las dos tipografías oficiales.
 empujar.py    Sube los cambios a GitHub y publica. Es el de LA PIZARRA con el
               repositorio cambiado, porque la red de IBERO bloquea github.com
@@ -131,8 +160,6 @@ PENDIENTES
     pero hay que contar los registros y la lectura está cerrada a quien no
     tiene sesión: se resolvería con una función que devuelva nada más el
     número de apuntados por día, sin los datos.
-  · Una pantalla en LA PIZARRA para ver la lista y palomear quién llegó.
-    La tabla ya trae `estado` y `nota` para eso.
 
 
 SEGUNDA VUELTA (8-oct-2026)
@@ -200,3 +227,39 @@ TERCERA VUELTA (8-oct-2026)
   · El uniforme es EL DE COMPETENCIA, el que usan en cancha. Y se quitó la
     comparación con "la ropa de diario", que sobraba y sonaba a regaño.
   · "¿Quién eres?" sonaba raro de más; ahora dice "Déjanos tu info".
+
+
+LA PANTALLA DE LA LISTA (8-oct-2026)
+-------------------------------------
+Leo preguntó dónde revisaba los confirmados. La respuesta honesta era "con
+un SQL", que no sirve, así que se hizo la pantalla.
+
+Vive en este mismo repositorio, no en LA PIZARRA, para no volver a atarlos.
+Lo que sí comparte son las CUENTAS, porque comparte la base.
+
+DE LOS CUATRO ESTADOS DE LA TABLA, LA PANTALLA USA DOS
+`apuntado` y `grabado`, que es lo que se necesita el día de la grabación: al
+cerrar el día, el que no tiene palomita es el que no llegó. `no llego` y
+`cancelado` siguen existiendo en la tabla por si hacen falta desde SQL, pero
+no se metieron a la pantalla para no llenarla de botones que nadie va a usar
+con las manos ocupadas.
+
+QUÉ SE COMPROBÓ Y QUÉ NO
+  Comprobado en el navegador:
+    · sin sesión sólo sale la caja de entrar, y no se filtra ningún dato
+    · con un correo que no existe dice "Correo o contraseña incorrectos"
+      y no guarda nada
+    · el agrupado por día, los contadores y sus singulares y plurales
+    · el buscador encuentra "María" escribiendo "maria", y también busca
+      por equipo
+    · los enlaces de WhatsApp salen bien con las tres formas de escribir el
+      teléfono (con espacios, con +52, y de diez dígitos pelones)
+    · el CSV sale con encabezados en español y el punto y coma de Excel
+    · en celular (375 px) no hay barrido horizontal
+
+  NO comprobado, y conviene que lo pruebe Leo la primera vez:
+    · entrar con una cuenta de verdad
+    · que la palomita guarde en la base
+  Las dos cosas piden una contraseña suya, que no se le pidió ni se usó.
+  La pantalla está escrita contra la misma API que ya usa LA PIZARRA
+  (/auth/v1/token y /rest/v1), pero eso es razonamiento, no medición.

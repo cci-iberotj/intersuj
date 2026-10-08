@@ -1,0 +1,485 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Lista de grabación · INTERSUJ 2026</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#F1EDE9">
+<style>
+@font-face{font-family:'Alverata';font-weight:400;font-style:normal;font-display:swap;
+  src:url(../assets/alverata-400.woff2) format('woff2')}
+@font-face{font-family:'Alverata';font-weight:700;font-style:normal;font-display:swap;
+  src:url(../assets/alverata-700.woff2) format('woff2')}
+@font-face{font-family:'MyriadIbero';font-weight:400;font-style:normal;font-display:swap;
+  src:url(../assets/myriad-400.woff2) format('woff2')}
+@font-face{font-family:'MyriadIbero';font-weight:600;font-style:normal;font-display:swap;
+  src:url(../assets/myriad-600.woff2) format('woff2')}
+@font-face{font-family:'MyriadIbero';font-weight:700;font-style:normal;font-display:swap;
+  src:url(../assets/myriad-700.woff2) format('woff2')}
+
+:root{
+  --rojo:#EA242F; --rojo-hondo:#7B1E2E;
+  --tinta:#191713; --tinta-media:#463F38; --tinta-tenue:#655C54;
+  --papel:#FFFFFF; --capa-0:#F1EDE9; --velo:#F6E9EB; --linea:#E2DBD4;
+  --ok:#2E6B41; --ok-velo:#E7F0E9;
+  --titulos:'Alverata',Georgia,serif;
+  --texto:'MyriadIbero','Segoe UI',system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--texto);background:var(--capa-0);color:var(--tinta);line-height:1.45;
+  -webkit-font-smoothing:antialiased}
+
+.hoja{max-width:820px;margin:0 auto;padding:26px 18px 80px}
+
+/* ───────── entrar ───────── */
+.entrar{max-width:380px;margin:12vh auto;background:var(--papel);border-radius:20px;
+  padding:34px 30px;box-shadow:0 2px 24px rgba(25,23,19,.08)}
+.entrar h1{font-family:var(--titulos);font-size:28px;line-height:1.1;margin-bottom:6px}
+.entrar p{font-size:15px;color:var(--tinta-tenue);margin-bottom:22px}
+.entrar label{display:block;font-size:13px;font-weight:600;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--tinta-tenue);margin:14px 0 6px}
+.entrar input{width:100%;font-family:var(--texto);font-size:17px;color:var(--tinta);
+  background:var(--papel);border:2px solid var(--linea);border-radius:12px;padding:13px 15px;outline:none}
+.entrar input:focus{border-color:var(--rojo)}
+.entrar button{width:100%;margin-top:22px;font-family:var(--texto);font-size:17px;font-weight:700;
+  color:#fff;background:var(--rojo);border:0;border-radius:12px;padding:15px;cursor:pointer}
+.entrar button[disabled]{background:var(--tinta-tenue)}
+.malo{display:none;margin-top:14px;font-size:15px;color:var(--rojo-hondo);
+  background:var(--velo);border-radius:11px;padding:12px 14px}
+.malo.visible{display:block}
+
+/* ───────── cabecera ───────── */
+.arriba{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;
+  flex-wrap:wrap;margin-bottom:20px}
+.arriba h1{font-family:var(--titulos);font-size:clamp(26px,5vw,36px);line-height:1.05}
+.arriba .quien{font-size:14px;color:var(--tinta-tenue)}
+.arriba .quien button{font-family:var(--texto);font-size:14px;color:var(--rojo-hondo);
+  background:none;border:0;border-bottom:1px solid currentColor;cursor:pointer;padding:0;margin-left:8px}
+
+.resumen{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:11px;margin-bottom:22px}
+.dato{background:var(--papel);border-radius:14px;padding:14px 16px}
+.dato .n{font-family:var(--titulos);font-weight:700;font-size:30px;line-height:1;color:var(--tinta)}
+.dato .q{font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--tinta-tenue);margin-top:5px}
+.dato.hecho .n{color:var(--ok)}
+
+.barra{display:flex;gap:10px;margin-bottom:22px;flex-wrap:wrap}
+.barra input{flex:1;min-width:180px;font-family:var(--texto);font-size:16px;color:var(--tinta);
+  background:var(--papel);border:2px solid var(--linea);border-radius:12px;padding:12px 14px;outline:none}
+.barra input:focus{border-color:var(--rojo)}
+.barra button{font-family:var(--texto);font-size:15px;font-weight:600;color:var(--tinta-media);
+  background:var(--papel);border:2px solid var(--linea);border-radius:12px;padding:12px 16px;cursor:pointer}
+.barra button:hover{border-color:var(--rojo);color:var(--rojo-hondo)}
+
+/* ───────── días y personas ───────── */
+.dia{margin-bottom:26px}
+/* nada de text-transform:capitalize aquí: pone mayúscula a cada palabra y
+   deja "Martes 13 De Octubre". La primera letra se sube en el JS. */
+.dia > h2{font-family:var(--titulos);font-size:21px;line-height:1.2;margin-bottom:3px}
+.dia > .cuantos{font-size:14px;color:var(--tinta-tenue);margin-bottom:12px}
+
+.persona{display:flex;align-items:center;gap:14px;background:var(--papel);border-radius:14px;
+  padding:13px 15px;margin-bottom:9px;border:2px solid transparent}
+.persona.grabado{background:var(--ok-velo);border-color:rgba(46,107,65,.22)}
+.persona .palomita{flex:none;width:34px;height:34px;border-radius:50%;border:2px solid #CFC7BF;
+  background:none;cursor:pointer;display:grid;place-items:center;transition:background .18s,border-color .18s}
+.persona.grabado .palomita{background:var(--ok);border-color:var(--ok)}
+.persona .palomita svg{width:17px;height:17px;stroke:#CFC7BF;stroke-width:3.4;fill:none;
+  stroke-linecap:round;stroke-linejoin:round}
+.persona.grabado .palomita svg{stroke:#fff}
+.persona .palomita:disabled{opacity:.4;cursor:default}
+.persona .quien{flex:1;min-width:0}
+.persona .nom{font-size:17px;font-weight:600;line-height:1.25}
+.persona.grabado .nom{color:var(--ok)}
+.persona .eq{font-size:14px;color:var(--tinta-tenue)}
+.persona .eq .flex{color:var(--rojo-hondo)}
+.persona .toca{display:flex;gap:7px;flex:none}
+.persona .toca a{width:36px;height:36px;border-radius:10px;background:var(--capa-0);
+  display:grid;place-items:center;color:var(--tinta-media);text-decoration:none;transition:background .18s,color .18s}
+.persona .toca a:hover{background:var(--rojo);color:#fff}
+.persona .toca svg{width:18px;height:18px;fill:currentColor}
+
+.vacio{background:var(--papel);border-radius:16px;padding:34px 24px;text-align:center;
+  color:var(--tinta-tenue);font-size:16px}
+.cargando{text-align:center;padding:40px;color:var(--tinta-tenue)}
+.firma{text-align:center;margin-top:34px;font-size:13px;color:var(--tinta-tenue)}
+@media (max-width:460px){
+  .persona{flex-wrap:wrap}
+  .persona .toca{width:100%;justify-content:flex-end}
+}
+</style>
+</head>
+<body>
+
+<div class="hoja" id="todo">
+  <div class="cargando">Un momento…</div>
+</div>
+
+<template id="plantilla-entrar">
+  <div class="entrar">
+    <h1>Lista de grabación</h1>
+    <p>INTERSUJ 2026 · entra con tu cuenta de LA PIZARRA.</p>
+    <form id="forma-entrar">
+      <label for="correo">Correo</label>
+      <input type="email" id="correo" autocomplete="username" required>
+      <label for="clave">Contraseña</label>
+      <input type="password" id="clave" autocomplete="current-password" required>
+      <button type="submit" id="boton-entrar">Entrar</button>
+      <p class="malo" id="malo"></p>
+    </form>
+  </div>
+</template>
+
+<script>
+'use strict';
+
+/* ═══════════════════════════════════════════════════════════
+   LISTA DE CONFIRMADOS · INTERSUJ 2026
+
+   La misma base que LA PIZARRA, y la misma cuenta. Esta pantalla
+   NO puede enseñar nada sin sesión: la regla de la tabla deja
+   escribir a cualquiera (ahí se apuntan los atletas) pero leer
+   sólo a quien entró. Si alguien abre esta página sin cuenta, lo
+   que ve es la caja de entrar y nada más.
+   ═══════════════════════════════════════════════════════════ */
+
+const BASE  = 'https://wrezcukptrtmnhnlxmao.supabase.co';
+const LLAVE = 'sb_publishable_XTkkarWw-P3Ls31g5ZDTOA_ZghkWshN';
+const TABLA = 'grabaciones_intersuj';
+const GUARDADA = 'intersuj-sesion';
+
+const SEMANA = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+const MESES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto',
+               'septiembre','octubre','noviembre','diciembre'];
+
+/* a mediodía: con 'AAAA-MM-DD' el navegador entiende UTC y en
+   Tijuana la fecha se recorre un día para atrás */
+const comoFecha = f => { const [a,m,d] = f.split('-').map(Number); return new Date(a, m-1, d, 12); };
+const enPalabras = f => {
+  const d = comoFecha(f);
+  return SEMANA[d.getDay()] + ' ' + d.getDate() + ' de ' + MESES[d.getMonth()];
+};
+
+/* ───────── la sesión ───────── */
+const Sesion = {
+  leer(){ try { return JSON.parse(localStorage.getItem(GUARDADA) || 'null'); } catch(e){ return null; } },
+  guardar(s){ s ? localStorage.setItem(GUARDADA, JSON.stringify(s)) : localStorage.removeItem(GUARDADA); },
+
+  async auth(ruta, cuerpo){
+    const r = await fetch(BASE + '/auth/v1' + ruta, {
+      method: 'POST',
+      headers: { apikey: LLAVE, 'Content-Type': 'application/json' },
+      body: JSON.stringify(cuerpo),
+    });
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok){
+      const e = new Error(d.error_description || d.msg || d.message || ('Error ' + r.status));
+      e.codigo = r.status;
+      throw e;
+    }
+    return d;
+  },
+
+  async entrar(correo, clave){
+    let d;
+    try {
+      d = await this.auth('/token?grant_type=password',
+                          { email: correo.trim(), password: clave });
+    } catch (e){
+      if (e.codigo === 400) throw new Error('Correo o contraseña incorrectos.');
+      throw e;
+    }
+    this.guardar({ acceso: d.access_token, refresco: d.refresh_token,
+                   expira: Date.now() + (d.expires_in || 3600) * 1000,
+                   correo: d.user && d.user.email });
+  },
+
+  /* El token dura una hora; cuando se vence se cambia por otro con
+     el de refresco, sin pedir la contraseña otra vez. */
+  async token(){
+    const s = this.leer();
+    if (!s) return null;
+    if (Date.now() < s.expira - 60000) return s.acceso;
+    try {
+      const d = await this.auth('/token?grant_type=refresh_token', { refresh_token: s.refresco });
+      this.guardar({ acceso: d.access_token, refresco: d.refresh_token,
+                     expira: Date.now() + (d.expires_in || 3600) * 1000, correo: s.correo });
+      return d.access_token;
+    } catch (e){
+      this.guardar(null);
+      return null;
+    }
+  },
+
+  salir(){ this.guardar(null); location.reload(); },
+};
+
+async function pedir(ruta, opciones = {}){
+  const token = await Sesion.token();
+  if (!token) throw new Error('SIN_SESION');
+  const r = await fetch(BASE + '/rest/v1' + ruta, {
+    method: opciones.method || 'GET',
+    headers: Object.assign({
+      apikey: LLAVE,
+      Authorization: 'Bearer ' + token,
+      'Content-Type': 'application/json',
+    }, opciones.headers || {}),
+    body: opciones.body ? JSON.stringify(opciones.body) : undefined,
+  });
+  if (r.status === 401){ Sesion.guardar(null); throw new Error('SIN_SESION'); }
+  if (r.status === 204) return null;
+  const d = await r.json().catch(() => null);
+  if (!r.ok) throw new Error((d && (d.message || d.hint)) || ('Error ' + r.status));
+  return d;
+}
+
+/* ───────── pantalla de entrar ───────── */
+function pedirEntrar(){
+  const todo = document.getElementById('todo');
+  todo.innerHTML = '';
+  todo.appendChild(document.getElementById('plantilla-entrar').content.cloneNode(true));
+
+  const forma = document.getElementById('forma-entrar');
+  const boton = document.getElementById('boton-entrar');
+  const malo  = document.getElementById('malo');
+
+  forma.addEventListener('submit', async e => {
+    e.preventDefault();
+    malo.classList.remove('visible');
+    boton.disabled = true;
+    boton.textContent = 'Entrando…';
+    try {
+      await Sesion.entrar(document.getElementById('correo').value,
+                          document.getElementById('clave').value);
+      pintar();
+    } catch (err){
+      malo.textContent = err.message;
+      malo.classList.add('visible');
+      boton.disabled = false;
+      boton.textContent = 'Entrar';
+    }
+  });
+}
+
+/* ───────── la lista ───────── */
+let TODOS = [];
+let filtro = '';
+
+const sinAcentos = s => (s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+
+async function pintar(){
+  const todo = document.getElementById('todo');
+  todo.innerHTML = '<div class="cargando">Cargando la lista…</div>';
+  try {
+    TODOS = await pedir('/' + TABLA + '?select=*&order=dia_fecha.asc,creado.asc');
+  } catch (e){
+    if (e.message === 'SIN_SESION') return pedirEntrar();
+    todo.innerHTML = '<div class="vacio">No se pudo cargar: ' + e.message + '</div>';
+    return;
+  }
+  dibujar();
+}
+
+function dibujar(){
+  const todo = document.getElementById('todo');
+  const s = Sesion.leer();
+  todo.innerHTML = '';
+
+  /* cabecera */
+  const arriba = document.createElement('div');
+  arriba.className = 'arriba';
+  arriba.innerHTML = '<div><h1>Lista de grabación</h1>' +
+    '<div class="quien">INTERSUJ 2026 · Aula Magna</div></div>' +
+    '<div class="quien"><span></span><button type="button">Salir</button></div>';
+  arriba.querySelector('.quien span').textContent = (s && s.correo) || '';
+  arriba.querySelector('button').addEventListener('click', () => Sesion.salir());
+  todo.appendChild(arriba);
+
+  /* números de arriba */
+  const grabados = TODOS.filter(p => p.estado === 'grabado').length;
+  const flexibles = TODOS.filter(p => p.flexible).length;
+  const resumen = document.createElement('div');
+  resumen.className = 'resumen';
+  const faltan = TODOS.length - grabados;
+  [[TODOS.length, TODOS.length === 1 ? 'apuntado' : 'apuntados'],
+   [grabados, grabados === 1 ? 'ya grabado' : 'ya grabados', 'hecho'],
+   [faltan, faltan === 1 ? 'falta' : 'faltan'],
+   [flexibles, flexibles === 1 ? 'puede moverse' : 'pueden moverse']]
+  .forEach(([n, q, clase]) => {
+    const d = document.createElement('div');
+    d.className = 'dato' + (clase ? ' ' + clase : '');
+    d.innerHTML = '<div class="n"></div><div class="q"></div>';
+    d.querySelector('.n').textContent = n;
+    d.querySelector('.q').textContent = q;
+    resumen.appendChild(d);
+  });
+  todo.appendChild(resumen);
+
+  /* buscar y bajar */
+  const barra = document.createElement('div');
+  barra.className = 'barra';
+  const buscar = document.createElement('input');
+  buscar.type = 'search';
+  buscar.placeholder = 'Buscar por nombre o equipo…';
+  buscar.value = filtro;
+  buscar.addEventListener('input', () => { filtro = buscar.value; dibujar();
+    const n = document.querySelector('.barra input'); n.focus();
+    n.setSelectionRange(n.value.length, n.value.length); });
+  const bajar = document.createElement('button');
+  bajar.type = 'button';
+  bajar.textContent = 'Bajar lista (CSV)';
+  bajar.addEventListener('click', aCSV);
+  const refrescar = document.createElement('button');
+  refrescar.type = 'button';
+  refrescar.textContent = 'Actualizar';
+  refrescar.addEventListener('click', pintar);
+  barra.append(buscar, refrescar, bajar);
+  todo.appendChild(barra);
+
+  /* por día */
+  const busca = sinAcentos(filtro);
+  const vistos = TODOS.filter(p => !busca ||
+    sinAcentos(p.nombre).includes(busca) || sinAcentos(p.equipo).includes(busca));
+
+  if (!vistos.length){
+    const v = document.createElement('div');
+    v.className = 'vacio';
+    v.textContent = TODOS.length ? 'Nadie con ese nombre.'
+      : 'Todavía no se apunta nadie. Aquí van a ir saliendo.';
+    todo.appendChild(v);
+  }
+
+  const dias = [...new Set(vistos.map(p => p.dia_fecha))].sort();
+  dias.forEach(fecha => {
+    const delDia = vistos.filter(p => p.dia_fecha === fecha);
+    const caja = document.createElement('section');
+    caja.className = 'dia';
+    const h = document.createElement('h2');
+    const dicho = fecha ? enPalabras(fecha) : 'Sin día';
+    h.textContent = dicho.charAt(0).toUpperCase() + dicho.slice(1);
+    const c = document.createElement('div');
+    c.className = 'cuantos';
+    const hechos = delDia.filter(p => p.estado === 'grabado').length;
+    c.textContent = (delDia[0].dia_desde ? delDia[0].dia_desde + ' a ' + delDia[0].dia_hasta + ' h · ' : '') +
+      delDia.length + (delDia.length === 1 ? ' apuntado' : ' apuntados') +
+      (hechos ? ' · ' + hechos + ' ya grabado' + (hechos === 1 ? '' : 's') : '');
+    caja.append(h, c);
+    delDia.forEach(p => caja.appendChild(renglon(p)));
+    todo.appendChild(caja);
+  });
+
+  const firma = document.createElement('p');
+  firma.className = 'firma';
+  firma.textContent = 'Diseño y Medios · IBERO Tijuana';
+  todo.appendChild(firma);
+}
+
+function renglon(p){
+  const fila = document.createElement('div');
+  fila.className = 'persona' + (p.estado === 'grabado' ? ' grabado' : '');
+
+  const boton = document.createElement('button');
+  boton.className = 'palomita';
+  boton.type = 'button';
+  boton.title = p.estado === 'grabado' ? 'Marcar como pendiente' : 'Ya lo grabamos';
+  boton.innerHTML = '<svg viewBox="0 0 24 24"><path d="M4 12.5l5.5 5.5L20 7"/></svg>';
+  boton.addEventListener('click', () => marcar(p, boton));
+
+  const quien = document.createElement('div');
+  quien.className = 'quien';
+  const nom = document.createElement('div');
+  nom.className = 'nom';
+  nom.textContent = p.nombre;
+  const eq = document.createElement('div');
+  eq.className = 'eq';
+  eq.textContent = p.equipo;
+  if (p.flexible){
+    const f = document.createElement('span');
+    f.className = 'flex';
+    f.textContent = ' · puede otro día';
+    eq.appendChild(f);
+  }
+  quien.append(nom, eq);
+
+  /* El teléfono se captura como lo escriban; para el enlace se dejan
+     nada más los dígitos y se le pone 52 si vino sin lada de país. */
+  const digitos = (p.telefono || '').replace(/\D/g, '');
+  const paraWa = digitos.length === 10 ? '52' + digitos : digitos;
+
+  const toca = document.createElement('div');
+  toca.className = 'toca';
+  if (digitos){
+    const w = document.createElement('a');
+    w.href = 'https://wa.me/' + paraWa;
+    w.target = '_blank'; w.rel = 'noopener';
+    w.title = 'WhatsApp · ' + p.telefono;
+    w.innerHTML = '<svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18a8 8 0 0 1-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1 1 12 20zm4.4-5.8c-.2-.1-1.4-.7-1.6-.8-.2-.1-.4-.1-.5.1l-.7.9c-.1.2-.3.2-.5.1a6.6 6.6 0 0 1-3.2-2.8c-.1-.2 0-.4.1-.5l.4-.5.2-.4v-.4l-.7-1.7c-.2-.4-.4-.4-.5-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.5.6 2.1.6 2.9.5.5 0 1.4-.6 1.6-1.1.2-.6.2-1 .1-1.1l-.6-.1z"/></svg>';
+    toca.appendChild(w);
+  }
+  if (p.correo){
+    const c = document.createElement('a');
+    c.href = 'mailto:' + p.correo;
+    c.title = p.correo;
+    c.innerHTML = '<svg viewBox="0 0 24 24"><path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 4.2-8 4.8-8-4.8V6l8 4.8L20 6z"/></svg>';
+    toca.appendChild(c);
+  }
+
+  fila.append(boton, quien, toca);
+  return fila;
+}
+
+/* Se pinta el cambio de inmediato y se guarda después: si la base
+   dice que no, se regresa como estaba y se avisa. Más vale eso que
+   dejar una palomita puesta que en realidad no se guardó. */
+async function marcar(p, boton){
+  const antes = p.estado;
+  const ahora = antes === 'grabado' ? 'apuntado' : 'grabado';
+  p.estado = ahora;
+  boton.disabled = true;
+  dibujar();
+  try {
+    await pedir('/' + TABLA + '?folio=eq.' + encodeURIComponent(p.folio),
+                { method: 'PATCH', body: { estado: ahora } });
+  } catch (e){
+    p.estado = antes;
+    dibujar();
+    if (e.message === 'SIN_SESION') return pedirEntrar();
+    alert('No se pudo guardar: ' + e.message);
+  }
+}
+
+/* ───────── bajar la lista ───────── */
+function aCSV(){
+  const campos = ['dia_fecha','dia_desde','dia_hasta','nombre','equipo','telefono',
+                  'correo','flexible','estado','creado'];
+  const titulos = ['Fecha','Desde','Hasta','Nombre','Equipo','Teléfono','Correo',
+                   'Puede otro día','Estado','Se apuntó'];
+  const escapa = v => {
+    const s = v === null || v === undefined ? '' : String(v);
+    return /[",;\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+  };
+  /* Punto y coma y BOM: así Excel en español lo abre en columnas y
+     con los acentos bien, sin tener que importar nada a mano. */
+  const renglones = [titulos.join(';')].concat(
+    TODOS.map(p => campos.map(c => escapa(
+      c === 'flexible' ? (p[c] ? 'sí' : 'no') : p[c])).join(';')));
+  const blob = new Blob(['﻿' + renglones.join('\r\n')],
+                        { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'grabacion-intersuj.csv';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+}
+
+/* ───────── arranque ───────── */
+(async function(){
+  const token = await Sesion.token();
+  if (token) pintar(); else pedirEntrar();
+})();
+</script>
+</body>
+</html>
