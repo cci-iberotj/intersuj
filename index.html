@@ -475,7 +475,30 @@ const enPalabras = d => {
       'END:VCALENDAR',
     ].join('\r\n');
 
-    const url = URL.createObjectURL(new Blob([ics], { type: 'text/calendar;charset=utf-8' }));
+    /* El estándar pide renglones de 75 octetos como mucho; los largos se
+       parten y siguen con un espacio al principio. Apple y Google aguantan
+       sin esto, Outlook no siempre — y el lugar lo escribe quien pone las
+       fechas, así que puede salir largo cualquier día. */
+    const partido = ics.split('
+').map(renglon => {
+      const bytes = new TextEncoder().encode(renglon);
+      if (bytes.length <= 75) return renglon;
+      const trozos = [];
+      let actual = '', largo = 0;
+      for (const letra of renglon){
+        const suma = new TextEncoder().encode(letra).length;
+        if (largo + suma > (trozos.length ? 74 : 75)){
+          trozos.push(actual); actual = ''; largo = 0;
+        }
+        actual += letra; largo += suma;
+      }
+      trozos.push(actual);
+      return trozos.join('
+ ');
+    }).join('
+');
+
+    const url = URL.createObjectURL(new Blob([partido], { type: 'text/calendar;charset=utf-8' }));
     const a = document.createElement('a');
     a.href = url;
     a.download = 'grabacion-intersuj.ics';

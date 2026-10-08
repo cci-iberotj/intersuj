@@ -3,7 +3,7 @@ AGENDA DE GRABACIÓN · INTERSUJ 2026 · IBERO Tijuana
 Formulario donde los atletas apartan su día para la sesión de video con
 fondo proyectado. Octubre 2026.
 
-    https://cci-iberotj.github.io/lapizarra/intersuj/
+    https://cci-iberotj.github.io/intersuj/
 
 
 CAMBIAR LOS DÍAS
@@ -24,7 +24,15 @@ Se pueden poner dos, tres o los que sean: la lista se pinta sola.
 LAS DE AHORA SON DE PRUEBA (13, 15 y 16 de octubre). Hay que cambiarlas por
 las buenas antes de mandar el enlace.
 
-Después de tocarlas:  python publicar.py  y empujar desde LA PIZARRA.
+Después de tocarlas:  python empujar.py  (y a verlo en un minuto).
+
+
+ESTE SITIO VIVE APARTE DE LA PIZARRA
+------------------------------------
+Repositorio propio: github.com/cci-iberotj/intersuj. Leo lo pidió así, para
+que un problema en LA PIZARRA no se lleve el formulario por delante. Lo que
+SÍ se comparte es la base de datos, que es lo que él escogió: un proyecto de
+Supabase aparte serían otras llaves y otra cuenta que mantener.
 
 
 DÓNDE CAEN LAS RESPUESTAS
@@ -85,7 +93,9 @@ QUÉ HAY AQUÍ
 ------------
 index.html    Todo: los días, el formulario y el envío.
 assets/       Banner, póster y las dos tipografías oficiales.
-publicar.py   Copia a LA PIZARRA\web\intersuj\ (y borra lo que ya no se usa).
+empujar.py    Sube los cambios a GitHub y publica. Es el de LA PIZARRA con el
+              repositorio cambiado, porque la red de IBERO bloquea github.com
+              y hay que subir por la API.
 LEEME.txt     Esto.
 
 
@@ -123,3 +133,42 @@ PENDIENTES
     número de apuntados por día, sin los datos.
   · Una pantalla en LA PIZARRA para ver la lista y palomear quién llegó.
     La tabla ya trae `estado` y `nota` para eso.
+
+
+SEGUNDA VUELTA (8-oct-2026)
+----------------------------
+Lo que Leo corrigió de la primera versión, y por qué:
+
+  · EL SITIO SALE DE LA PIZARRA. Repositorio propio, cci-iberotj/intersuj.
+    El empujar.py de aquí es el de LA PIZARRA con el repositorio cambiado y
+    un arreglo: diff-tree necesita --root para el PRIMER commit de un
+    repositorio, si no manda el árbol vacío y GitHub responde "Invalid tree
+    info". Y un repositorio recién creado está vacío, sin rama: hay que
+    sembrarlo con un archivo (se hizo con el README, por la API de
+    contenidos) antes de que empujar.py pueda trabajar.
+
+  · EL TEXTO SONABA HOSTIL. "limpio y sin arrugas", "son los únicos días",
+    "fuera de ahí ya no hay otra fecha". Se puede ser firme sin regañar:
+    ahora dice que el foro sólo está montado esos días y que por eso
+    conviene escoger desde ahora. El uniforme se pide porque "en cámara se
+    ve mucho mejor que la ropa de diario", no como orden.
+
+  · NO ES PARA LAS PRESENTACIONES DE CADA DEPORTISTA. Eso lo decía la
+    primera versión y no era cierto: Leo prevé que no vengan todos, así que
+    para presentarlos usará las fotos individuales que ya tomó. El
+    formulario ya no promete para qué se usa el video.
+
+  · EL TÍTULO NO TENÍA SENTIDO. "Te toca frente a cámara" — ya han estado
+    frente a cámara. Y no son "gráficos del torneo": son motion graphics con
+    video de Tijuana y palabras clave. De ahí salió "Tijuana atrás de ti".
+
+  · FUERA EL ACUSE. No le servía a nadie. El folio sigue existiendo como
+    llave de la tabla, pero ya no se le enseña a quien se apunta.
+
+  · EN SU LUGAR, BOTÓN DE CALENDARIO. Arma un .ics en el propio navegador,
+    sin pedirle nada a ningún servicio, y deja recordatorio dos horas antes.
+    Las horas van SIN zona horaria a propósito ("flotantes"): cada teléfono
+    las toma como hora local, que es la de Tijuana para todos, y así nos
+    ahorramos el bloque de horario de verano.
+    Correo automático sí se puede, pero necesita conectar un servicio de
+    envío (Resend o parecido). Quedó para después.
