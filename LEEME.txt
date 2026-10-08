@@ -12,7 +12,7 @@ Es lo único que se toca seguido. Está hasta arriba del index.html, en un
 bloque marcado, y NO hay que correr nada: se guarda y se ve al recargar.
 
     { "id": "d1", "fecha": "2026-10-13", "desde": "10:00", "hasta": "11:00",
-      "lugar": "Foro · Diseño y Medios", "nota": "" }
+      "lugar": "Aula Magna", "nota": "" }
 
     id      queda guardado en la base. NO se recicla: si se cambia un día,
             mejor un id nuevo, para no mezclar a los que ya se apuntaron.
@@ -176,7 +176,8 @@ Lo que Leo corrigió de la primera versión, y por qué:
 UN ERROR QUE YA ESTABA DOCUMENTADO Y VOLVÍ A COMETER
 ----------------------------------------------------
 Al agregar el plegado de renglones del .ics escribí el parche con un heredoc
-de bash. Los 
+de bash. Los 
+
  del código se convirtieron en retornos y saltos DE VERDAD
 dentro de la cadena de JavaScript, así que quedó abierta, el script completo
 dejó de correr y la página salió SIN NINGÚN DÍA que escoger.
@@ -188,3 +189,14 @@ decía "Uncaught SyntaxError: Invalid or unexpected token".
 LA REGLA, otra vez: los parches se escriben con el editor, en un archivo .py,
 NUNCA por heredoc. Ya estaba escrito en el LEEME del Encuentro IBERO y aun
 así volvió a pasar.
+
+TERCERA VUELTA (8-oct-2026)
+----------------------------
+  · ES EN EL AULA MAGNA. Sale en las tres tarjetas, en una píldora de la
+    portada, en el texto y en el .ics (LOCATION y SUMMARY).
+  · PARA QUÉ ES EL VIDEO, que antes no se podía decir: con todas las tomas
+    se arma el que se proyecta EL DÍA DEL ABANDERAMIENTO. Eso ya está en el
+    texto, y es lo que da razón para venir.
+  · El uniforme es EL DE COMPETENCIA, el que usan en cancha. Y se quitó la
+    comparación con "la ropa de diario", que sobraba y sonaba a regaño.
+  · "¿Quién eres?" sonaba raro de más; ahora dice "Déjanos tu info".

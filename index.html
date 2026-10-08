@@ -16,7 +16,7 @@
        fecha   AAAA-MM-DD
        desde   hora de inicio, 24 h
        hasta   hora de término
-       lugar   dónde se graba
+       lugar   dónde se graba (ahora el Aula Magna)
        nota    opcional, sale en chiquito en la tarjeta
 
      Las de ahora son DE PRUEBA: la semana del 12 de octubre.
@@ -24,11 +24,11 @@
 <script id="dias-datos" type="application/json">
 [
   { "id": "d1", "fecha": "2026-10-13", "desde": "10:00", "hasta": "11:00",
-    "lugar": "Foro · Diseño y Medios", "nota": "" },
+    "lugar": "Aula Magna", "nota": "" },
   { "id": "d2", "fecha": "2026-10-15", "desde": "13:00", "hasta": "14:00",
-    "lugar": "Foro · Diseño y Medios", "nota": "" },
+    "lugar": "Aula Magna", "nota": "" },
   { "id": "d3", "fecha": "2026-10-16", "desde": "11:00", "hasta": "12:00",
-    "lugar": "Foro · Diseño y Medios", "nota": "" }
+    "lugar": "Aula Magna", "nota": "" }
 ]
 </script>
 
@@ -219,6 +219,7 @@ h3.rotulo{font-size:13px;font-weight:700;letter-spacing:.2em;text-transform:uppe
     <p class="bajada">La toma que nos falta: tú al frente y la ciudad proyectada en la
       pared, con las palabras del torneo. Así se va a ver.</p>
     <div class="abajo">
+      <span class="pildora">Aula Magna</span>
       <span class="pildora">Toma individual</span>
       <span class="pildora">10 minutos</span>
       <span class="pildora">Tú escoges el día</span>
@@ -231,13 +232,14 @@ h3.rotulo{font-size:13px;font-weight:700;letter-spacing:.2em;text-transform:uppe
   <section class="explica">
     <h2>Aparta tu día</h2>
     <p>Ya los grabamos en cancha y les tomamos fotos. Falta esta sesión, que es
-      distinta: una toma tuya con la proyección atrás —video de Tijuana y palabras
-      del torneo, en movimiento.</p>
-    <p><b>El foro sólo va a estar montado esos días.</b> Después lo desarmamos para
-      seguir con la edición, así que vale la pena que escojas el tuyo desde ahora.</p>
+      distinta: una toma tuya en el <b>Aula Magna</b>, con la proyección atrás —video
+      de Tijuana y palabras del torneo, en movimiento.</p>
+    <p>Con todas esas tomas se arma el <b>video que se proyecta el día del
+      abanderamiento</b>. Por eso vale la pena que estés.</p>
+    <p><b>El montaje sólo va a estar esos días.</b> Después lo desarmamos para seguir
+      con la edición, así que conviene que escojas el tuyo desde ahora.</p>
     <ul class="puntos">
-      <li>Ven con el uniforme de tu disciplina: en cámara se ve mucho mejor que la
-        ropa de diario.</li>
+      <li>Ven con el uniforme con el que compites, el de tu disciplina.</li>
       <li>Son unos 10 minutos. Te vamos diciendo qué hacer ahí mismo, no tienes que
         preparar nada.</li>
       <li>Si quieres salir con tu balón, raqueta o careta, tráelos. Ayudan a la toma.</li>
@@ -264,7 +266,7 @@ h3.rotulo{font-size:13px;font-weight:700;letter-spacing:.2em;text-transform:uppe
 
     <section class="seccion">
       <h3 class="rotulo">Paso 2</h3>
-      <h2>¿Quién eres?</h2>
+      <h2>Déjanos tu info</h2>
       <p class="pie">Es para avisarte si algo cambia de última hora.</p>
 
       <div class="campos">
@@ -462,10 +464,10 @@ const enPalabras = d => {
       'DTSTAMP:' + sello,
       'DTSTART:' + sinGuiones + 'T' + aHora(dia.desde),
       'DTEND:'   + sinGuiones + 'T' + aHora(dia.hasta),
-      'SUMMARY:Grabación INTERSUJ 2026',
+      'SUMMARY:Grabación INTERSUJ 2026 · Aula Magna',
       'LOCATION:' + dia.lugar,
-      'DESCRIPTION:Tu toma para el video del INTERSUJ. Ven con el uniforme de tu ' +
-        'disciplina. Son unos 10 minutos.',
+      'DESCRIPTION:Tu toma para el video del abanderamiento. Ven con el uniforme ' +
+        'con el que compites. Son unos 10 minutos.',
       'BEGIN:VALARM',
       'TRIGGER:-PT2H',
       'ACTION:DISPLAY',
