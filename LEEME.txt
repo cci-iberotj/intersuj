@@ -21,8 +21,8 @@ bloque marcado, y NO hay que correr nada: se guarda y se ve al recargar.
 
 Se pueden poner dos, tres o los que sean: la lista se pinta sola.
 
-LAS DE AHORA SON DE PRUEBA (13, 15 y 16 de octubre). Hay que cambiarlas por
-las buenas antes de mandar el enlace.
+LAS DE AHORA SON LAS BUENAS, confirmadas por Leo el 8-oct-2026:
+martes 13, miércoles 14 y jueves 15 de octubre, de 10:00 a 13:00, Aula Magna.
 
 Después de tocarlas:  python empujar.py  (y a verlo en un minuto).
 
@@ -291,3 +291,20 @@ se comía justo los gráficos que se quieren enseñar. Abajo de 760 px el video
 deja de ser fondo: se vuelve una banda con su proporción real (1600x600) y el
 texto pasa debajo, sobre el negro. Medido: a 375 px de ancho el video ocupa
 375x141, que es exactamente 2.67, la misma proporción del archivo.
+
+
+LAS FECHAS BUENAS (8-oct-2026)
+-------------------------------
+Martes 13, miércoles 14 y jueves 15 de octubre, de 10:00 a 13:00 en el Aula
+Magna. Se le preguntó la SEMANA a propósito en vez de deducirla: "martes,
+miércoles y jueves" cabía en tres semanas distintas y el enlace se le iba a
+mandar a 33 atletas.
+
+Son tres horas por día y cada toma son diez minutos; con 33 atletas en tres
+días salen 11 diarios, o sea menos de dos horas de grabación por día. Aun
+así NO se les escribe "llega cuando quieras" — Leo lo pidió expresamente.
+El formulario da el horario y ya: "Vamos a estar grabando de 10 de la mañana
+a 1 de la tarde."
+
+El .ics les aparta las tres horas completas. Es a propósito: no hay hora
+asignada por persona, así que reservar la ventana entera es lo honesto.
