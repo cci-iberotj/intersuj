@@ -172,3 +172,19 @@ Lo que Leo corrigió de la primera versión, y por qué:
     ahorramos el bloque de horario de verano.
     Correo automático sí se puede, pero necesita conectar un servicio de
     envío (Resend o parecido). Quedó para después.
+
+UN ERROR QUE YA ESTABA DOCUMENTADO Y VOLVÍ A COMETER
+----------------------------------------------------
+Al agregar el plegado de renglones del .ics escribí el parche con un heredoc
+de bash. Los 
+ del código se convirtieron en retornos y saltos DE VERDAD
+dentro de la cadena de JavaScript, así que quedó abierta, el script completo
+dejó de correr y la página salió SIN NINGÚN DÍA que escoger.
+
+En el código no se notaba: el archivo se veía razonable y hasta se publicó.
+Se vio abriendo la página y contando los días (salieron 0), y la consola
+decía "Uncaught SyntaxError: Invalid or unexpected token".
+
+LA REGLA, otra vez: los parches se escriben con el editor, en un archivo .py,
+NUNCA por heredoc. Ya estaba escrito en el LEEME del Encuentro IBERO y aun
+así volvió a pasar.
