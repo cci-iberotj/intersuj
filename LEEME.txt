@@ -1,0 +1,125 @@
+AGENDA DE GRABACIÓN · INTERSUJ 2026 · IBERO Tijuana
+====================================================
+Formulario donde los atletas apartan su día para la sesión de video con
+fondo proyectado. Octubre 2026.
+
+    https://cci-iberotj.github.io/lapizarra/intersuj/
+
+
+CAMBIAR LOS DÍAS
+----------------
+Es lo único que se toca seguido. Está hasta arriba del index.html, en un
+bloque marcado, y NO hay que correr nada: se guarda y se ve al recargar.
+
+    { "id": "d1", "fecha": "2026-10-13", "desde": "10:00", "hasta": "11:00",
+      "lugar": "Foro · Diseño y Medios", "nota": "" }
+
+    id      queda guardado en la base. NO se recicla: si se cambia un día,
+            mejor un id nuevo, para no mezclar a los que ya se apuntaron.
+    fecha   AAAA-MM-DD. El día de la semana y el mes los calcula sola.
+    nota    opcional, sale en chiquito ("último bloque", "sólo voleibol"…)
+
+Se pueden poner dos, tres o los que sean: la lista se pinta sola.
+
+LAS DE AHORA SON DE PRUEBA (13, 15 y 16 de octubre). Hay que cambiarlas por
+las buenas antes de mandar el enlace.
+
+Después de tocarlas:  python publicar.py  y empujar desde LA PIZARRA.
+
+
+DÓNDE CAEN LAS RESPUESTAS
+-------------------------
+En Supabase, tabla `grabaciones_intersuj`, la misma base de LA PIZARRA.
+El SQL que la crea vive en LA PIZARRA\supabase\grabaciones_intersuj.sql y
+se puede volver a correr sin miedo.
+
+Para verlas, mientras no haya pantalla en LA PIZARRA:
+
+    cd "...\LA PIZARRA"
+    (un .sql con)  select * from public.grabaciones_intersuj order by dia_fecha, creado;
+    python supabase/correr.py ese.sql
+
+EL PERMISO VA AL REVÉS QUE EN EL RESTO DE LA PIZARRA
+Quien se apunta es un alumno con un navegador: no tiene cuenta y no debe
+tenerla. Entonces cualquiera puede ESCRIBIR su registro, y sólo el equipo
+con sesión puede LEER la lista. Esto está comprobado, no supuesto:
+
+    apuntarse bien                 201  sí
+    leer la lista sin sesión       200 pero devuelve []   no ve nada
+    meter basura (campos enormes)  401  rechazado por la regla
+    borrar sin sesión              204 pero cero renglones  no borra
+
+La llave que va en el index.html es la PUBLICABLE, la misma de LA PIZARRA:
+está hecha para vivir en el navegador de cualquiera. Lo que protege los
+datos son esas reglas, no esconderla. La secreta no está aquí ni debe estar.
+
+
+EL BANNER
+---------
+    assets/banner.mp4   1600x600, 12 s, 2.2 MB, SIN audio
+    assets/poster.jpg   lo que se ve mientras carga, y si el video no corre
+
+Sale del clip que grabó Leo:
+    D:\INTERSUJ 2026\CLIP EJEMPLO PARA FORMULRAIO DE AGENDA GRABACION.mp4
+    (1920x720, 22 MB)
+
+Para rehacerlo si cambia el clip:
+
+    ffmpeg -i "CLIP EJEMPLO....mp4" -an -vf "scale=1600:-2" ^
+      -c:v libx264 -preset slow -crf 27 -maxrate 2600k -bufsize 5200k ^
+      -pix_fmt yuv420p -movflags +faststart assets/banner.mp4
+    ffmpeg -ss 11 -i "CLIP EJEMPLO....mp4" -frames:v 1 -vf "scale=1600:-2" ^
+      -q:v 4 assets/poster.jpg
+
+VA MUDO A PROPÓSITO. Ningún navegador deja que un video arranque solo con
+sonido: si lleva audio, no se reproduce y se queda en el póster. Sin audio,
+arranca siempre. Por eso tampoco hay botón de sonido.
+
+Y se pausa cuando sale de pantalla, que en el celular es casi todo el rato:
+así no gasta datos de quien está llenando el formulario. Si la página abre
+en una pestaña de fondo, se reintenta al volver — si no, Chrome la deja
+congelada en el primer cuadro.
+
+
+QUÉ HAY AQUÍ
+------------
+index.html    Todo: los días, el formulario y el envío.
+assets/       Banner, póster y las dos tipografías oficiales.
+publicar.py   Copia a LA PIZARRA\web\intersuj\ (y borra lo que ya no se usa).
+LEEME.txt     Esto.
+
+
+COMPROBADO EN NAVEGADOR, NO SUPUESTO
+------------------------------------
+  · un registro de prueba llegó completo a la base y se leyó de vuelta
+  · las cuatro pruebas de permisos de arriba
+  · mandar vacío marca los cinco campos y no envía nada
+  · teléfono corto y correo mal escrito se marcan; se cuentan los DÍGITOS,
+    así que valen los espacios, los guiones y el +52
+  · si la red falla, el aviso dice qué hacer y a dónde escribir, en vez de
+    "algo salió mal"
+  · en celular (375 px) no hay barrido horizontal y las tarjetas de día
+    miden 117 px de alto: se tocan bien con el pulgar
+  · la fecha se arma a mediodía a propósito: con 'AAAA-MM-DD' el navegador
+    la entiende en UTC y en Tijuana se recorre un día para atrás
+
+DOS ERRORES QUE SÓLO SE VIERON MIRANDO LA PÁGINA
+  1. `id="dias"` estaba repetido: en el <script> del JSON y en el contenedor.
+     getElementById devuelve el primero, así que las tarjetas se insertaban
+     DENTRO del script del <head> y no se veían. El DOM respondía bien a las
+     consultas; la página estaba vacía. Ahora el JSON es `dias-datos`.
+  2. Los textos de la tarjeta iban en <span> sin display:block y salían
+     pegados: "Martes10:00 a 11:00 hForo · Diseño y Medios".
+
+
+PENDIENTES
+----------
+  · LAS FECHAS BUENAS. Las de ahora son de prueba.
+  · Decidir si se avisa por correo a quien se apunta. Hoy sólo ve el acuse
+    en pantalla; no se le manda nada.
+  · Si hace falta cupo por día (cerrar un bloque al llenarse), se puede,
+    pero hay que contar los registros y la lectura está cerrada a quien no
+    tiene sesión: se resolvería con una función que devuelva nada más el
+    número de apuntados por día, sin los datos.
+  · Una pantalla en LA PIZARRA para ver la lista y palomear quién llegó.
+    La tabla ya trae `estado` y `nota` para eso.
