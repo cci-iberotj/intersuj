@@ -154,6 +154,14 @@ h3.rotulo{font-size:13px;font-weight:700;letter-spacing:.2em;text-transform:uppe
   padding:14px 16px;outline:none;transition:border-color .18s}
 .campo input:focus{border-color:var(--rojo)}
 .campo input::placeholder{color:#B5ACA3}
+.campo select{width:100%;font-family:var(--texto);font-size:17px;color:var(--tinta);
+  background:var(--papel);border:2px solid var(--linea);border-radius:13px;
+  padding:14px 16px;outline:none;transition:border-color .18s;appearance:none;
+  background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23655C54'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 13px center;background-size:22px;
+  padding-right:44px}
+.campo select:focus{border-color:var(--rojo)}
+.campo select:invalid,.campo select option[value=""]{color:#B5ACA3}
 .campo.mal input{border-color:var(--rojo)}
 .campo .error{display:none;font-size:14px;color:var(--rojo-hondo);margin-top:6px}
 .campo.mal .error{display:block}
@@ -200,6 +208,21 @@ h3.rotulo{font-size:13px;font-weight:700;letter-spacing:.2em;text-transform:uppe
   letter-spacing:.04em}
 .firma b{font-weight:600;color:var(--tinta-media)}
 
+/* EN EL CELULAR EL BANNER VA COMPLETO.
+   De fondo con object-fit:cover, una pantalla angosta le recortaba los
+   lados y se comía justo los gráficos que se quieren enseñar. Abajo de
+   760 px el video deja de ser fondo: se vuelve una banda con su propia
+   proporción (1600x600) y el texto pasa debajo, sobre el negro. */
+@media (max-width:760px){
+  .portada{display:flex;flex-direction:column}
+  .portada video{position:relative;inset:auto;width:100%;height:auto;
+    aspect-ratio:8/3;object-fit:contain;background:#000}
+  .portada .respaldo{display:none}   /* el <video> ya trae su propio póster */
+  .portada::after{display:none}      /* el velo era para leer encima del video */
+  .portada .dentro{padding:30px 22px 40px}
+  .portada h1{text-shadow:none}
+}
+
 @media (prefers-reduced-motion:reduce){
   *{animation:none!important;transition:none!important}
   html{scroll-behavior:auto}
@@ -242,7 +265,6 @@ h3.rotulo{font-size:13px;font-weight:700;letter-spacing:.2em;text-transform:uppe
       <li>Ven con el uniforme con el que compites, el de tu disciplina.</li>
       <li>Son unos 10 minutos. Te vamos diciendo qué hacer ahí mismo, no tienes que
         preparar nada.</li>
-      <li>Si quieres salir con tu balón, raqueta o careta, tráelos. Ayudan a la toma.</li>
       <li>El bloque es de una hora para todo el grupo del día. Llegando a tiempo nos
         alcanza bien para todos.</li>
     </ul>
@@ -278,16 +300,11 @@ h3.rotulo{font-size:13px;font-weight:700;letter-spacing:.2em;text-transform:uppe
         </div>
 
         <div class="campo" id="campo-equipo">
-          <label for="equipo">Equipo o disciplina</label>
-          <input type="text" id="equipo" name="equipo" list="disciplinas"
-                 placeholder="Voleibol femenino, flag, tae kwon do…" maxlength="70">
-          <datalist id="disciplinas">
-            <option value="Flag femenil"></option>
-            <option value="Voleibol femenino"></option>
-            <option value="Voleibol masculino"></option>
-            <option value="Tae kwon do"></option>
-          </datalist>
-          <p class="error">Falta tu equipo o disciplina.</p>
+          <label for="equipo">Tu equipo</label>
+          <select id="equipo" name="equipo">
+            <option value="">Escoge tu equipo…</option>
+          </select>
+          <p class="error">Falta escoger tu equipo.</p>
         </div>
 
         <div class="dos">
@@ -357,6 +374,40 @@ const enPalabras = d => {
           'septiembre','octubre','noviembre','diciembre'][f.getMonth()] +
          ', de ' + d.desde + ' a ' + d.hasta;
 };
+
+/* ───────── los equipos ─────────
+   Vienen de equipos.json, que lee también la pantalla de la lista: así los
+   dos lados dicen lo mismo sin tener la lista copiada en cada uno.
+
+   Si por lo que sea no se puede leer, el desplegable se cambia por un campo
+   de escribir. Vale más que alguien teclee su equipo a que se quede sin
+   poder apuntarse. */
+(async function(){
+  const caja = document.getElementById('equipo');
+  try {
+    const r = await fetch('equipos.json', { cache: 'no-cache' });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const equipos = (await r.json()).equipos || [];
+    if (!equipos.length) throw new Error('vacío');
+    equipos.forEach(e => {
+      const o = document.createElement('option');
+      o.value = e.nombre;
+      o.textContent = e.nombre;
+      caja.appendChild(o);
+    });
+  } catch (err){
+    const campo = document.createElement('input');
+    campo.type = 'text';
+    campo.id = 'equipo';
+    campo.name = 'equipo';
+    campo.maxLength = 70;
+    campo.placeholder = 'Voleibol femenil, flag, taekwondo…';
+    caja.replaceWith(campo);
+    campo.addEventListener('input', () =>
+      document.getElementById('campo-equipo').classList.remove('mal'));
+    console.error('No se pudo leer equipos.json:', err);
+  }
+})();
 
 /* ───────── pintar los días ───────── */
 (function(){
@@ -432,7 +483,8 @@ const enPalabras = d => {
   ['nombre','equipo','tel','correo'].forEach(id =>
     document.getElementById(id).addEventListener('input', () => campo(id).classList.remove('mal')));
   forma.addEventListener('change', e => {
-    if (e.target.name === 'dia') campo('dia').classList.remove('mal');
+    if (e.target.name === 'dia')    campo('dia').classList.remove('mal');
+    if (e.target.id   === 'equipo') campo('equipo').classList.remove('mal');
   });
 
   /* El folio ya no se le enseña a nadie: sirve de llave de la tabla y para

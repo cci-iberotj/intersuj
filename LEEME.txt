@@ -120,6 +120,9 @@ congelada en el primer cuadro.
 QUÉ HAY AQUÍ
 ------------
 index.html    El formulario: los días, los campos y el envío.
+equipos.json  LOS EQUIPOS, con cuántos atletas tiene cada uno. Lo leen los
+              dos lados: el formulario arma con él la lista desplegable, y
+              la pantalla de la lista dice cuántos de cada equipo faltan.
 lista/        La pantalla para ver quién se apuntó y palomear quién llegó.
 assets/       Banner, póster y las dos tipografías oficiales.
 empujar.py    Sube los cambios a GitHub y publica. Es el de LA PIZARRA con el
@@ -263,3 +266,28 @@ QUÉ SE COMPROBÓ Y QUÉ NO
   Las dos cosas piden una contraseña suya, que no se le pidió ni se usó.
   La pantalla está escrita contra la misma API que ya usa LA PIZARRA
   (/auth/v1/token y /rest/v1), pero eso es razonamiento, no medición.
+
+
+LOS EQUIPOS Y EL BANNER EN EL CELULAR (8-oct-2026)
+---------------------------------------------------
+  · Fuera lo de traer balón o raqueta.
+  · El equipo dejó de escribirse a mano: ahora es una lista desplegable que
+    sale de equipos.json. Así nadie lo teclea distinto ("volei", "Voleibol
+    Fem.") y las cuentas por equipo cuadran.
+    Los cinco equipos, con sus números: Voleibol femenil 10, Voleibol
+    varonil 8, Flag femenil 9, Taekwondo femenil 2, Taekwondo varonil 4.
+    Son 33 atletas.
+  · Si equipos.json no se puede leer, el desplegable se convierte en un
+    campo de escribir. Vale más que alguien teclee su equipo a que se quede
+    sin poder apuntarse.
+  · La pantalla de la lista usa esos números para decir "3 de 10" por equipo
+    y "7 de 33" arriba. Sin ese dato, "7 apuntados" no dice si falta medio
+    equipo o nadie. Quien se haya apuntado con un equipo que no está en el
+    catálogo sale aparte, en "Otros".
+
+EL BANNER EN EL CELULAR
+De fondo con object-fit:cover, una pantalla angosta le recortaba los lados y
+se comía justo los gráficos que se quieren enseñar. Abajo de 760 px el video
+deja de ser fondo: se vuelve una banda con su proporción real (1600x600) y el
+texto pasa debajo, sobre el negro. Medido: a 375 px de ancho el video ocupa
+375x141, que es exactamente 2.67, la misma proporción del archivo.

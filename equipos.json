@@ -1,0 +1,24 @@
+{
+  "_leeme": [
+    "LOS EQUIPOS QUE VAN AL INTERSUJ 2026.",
+    "",
+    "Este archivo lo leen los DOS lados:",
+    "  · el formulario, para armar la lista desplegable de disciplinas",
+    "  · la pantalla de la lista, para decir cuántos de cada equipo se han",
+    "    apuntado de los que son ('3 de 10')",
+    "Por eso vive aparte y no copiado en cada uno: si se cambia aquí, se",
+    "cambia en los dos sin que se puedan desincronizar.",
+    "",
+    "cuantos = cuántos atletas tiene el equipo. Si no se sabe, poner 0 y",
+    "la pantalla sólo contará los apuntados, sin el total.",
+    "",
+    "Después de tocarlo:  python empujar.py"
+  ],
+  "equipos": [
+    { "nombre": "Voleibol femenil",  "cuantos": 10 },
+    { "nombre": "Voleibol varonil",  "cuantos": 8 },
+    { "nombre": "Flag femenil",      "cuantos": 9 },
+    { "nombre": "Taekwondo femenil", "cuantos": 2 },
+    { "nombre": "Taekwondo varonil", "cuantos": 4 }
+  ]
+}

@@ -63,6 +63,21 @@ body{font-family:var(--texto);background:var(--capa-0);color:var(--tinta);line-h
 .dato .q{font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--tinta-tenue);margin-top:5px}
 .dato.hecho .n{color:var(--ok)}
 
+/* cuántos de cada equipo faltan por apuntarse: es lo que dice a quién hay
+   que ir a buscar. Los totales salen de equipos.json. */
+.equipos{background:var(--papel);border-radius:14px;padding:6px 16px;margin-bottom:22px}
+.equipos .eq{display:flex;align-items:center;gap:12px;padding:10px 0;
+  border-bottom:1px solid var(--linea);font-size:15px}
+.equipos .eq:last-child{border-bottom:0}
+.equipos .eq .n{flex:1;color:var(--tinta-media)}
+.equipos .eq .cuenta{font-variant-numeric:tabular-nums;color:var(--tinta-tenue);font-size:14px}
+.equipos .eq .riel{flex:none;width:92px;height:7px;border-radius:99px;background:var(--capa-0);
+  overflow:hidden}
+.equipos .eq .riel i{display:block;height:100%;background:var(--rojo-hondo);border-radius:99px}
+.equipos .eq.lleno .n{color:var(--ok);font-weight:600}
+.equipos .eq.lleno .riel i{background:var(--ok)}
+.equipos .eq.lleno .cuenta{color:var(--ok)}
+
 .barra{display:flex;gap:10px;margin-bottom:22px;flex-wrap:wrap}
 .barra input{flex:1;min-width:180px;font-family:var(--texto);font-size:16px;color:var(--tinta);
   background:var(--papel);border:2px solid var(--linea);border-radius:12px;padding:12px 14px;outline:none}
@@ -263,6 +278,7 @@ function pedirEntrar(){
 
 /* ───────── la lista ───────── */
 let TODOS = [];
+let EQUIPOS = [];     // de equipos.json, el mismo que usa el formulario
 let filtro = '';
 
 const sinAcentos = s => (s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
@@ -270,6 +286,13 @@ const sinAcentos = s => (s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLow
 async function pintar(){
   const todo = document.getElementById('todo');
   todo.innerHTML = '<div class="cargando">Cargando la lista…</div>';
+  /* los equipos son opcionales: si no se pueden leer, la pantalla sigue
+     sirviendo, nada más sin el desglose de cuántos faltan por equipo */
+  try {
+    const r = await fetch('../equipos.json', { cache: 'no-cache' });
+    if (r.ok) EQUIPOS = (await r.json()).equipos || [];
+  } catch (e){ EQUIPOS = []; }
+
   try {
     TODOS = await pedir('/' + TABLA + '?select=*&order=dia_fecha.asc,creado.asc');
   } catch (e){
@@ -301,7 +324,11 @@ function dibujar(){
   const resumen = document.createElement('div');
   resumen.className = 'resumen';
   const faltan = TODOS.length - grabados;
-  [[TODOS.length, TODOS.length === 1 ? 'apuntado' : 'apuntados'],
+  /* cuántos atletas hay en total, según equipos.json: sin eso, "7 apuntados"
+     no dice si falta medio equipo o nadie */
+  const deTodos = EQUIPOS.reduce((suma, e) => suma + (e.cuantos || 0), 0);
+  [[deTodos ? TODOS.length + ' de ' + deTodos : TODOS.length,
+    TODOS.length === 1 && !deTodos ? 'apuntado' : 'apuntados'],
    [grabados, grabados === 1 ? 'ya grabado' : 'ya grabados', 'hecho'],
    [faltan, faltan === 1 ? 'falta' : 'faltan'],
    [flexibles, flexibles === 1 ? 'puede moverse' : 'pueden moverse']]
@@ -314,6 +341,40 @@ function dibujar(){
     resumen.appendChild(d);
   });
   todo.appendChild(resumen);
+
+  /* cuántos de cada equipo ya se apuntaron */
+  if (EQUIPOS.length){
+    const caja = document.createElement('div');
+    caja.className = 'equipos';
+    const sinAcento = s => (s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+    EQUIPOS.forEach(e => {
+      const hay = TODOS.filter(p => sinAcento(p.equipo) === sinAcento(e.nombre)).length;
+      const total = e.cuantos || 0;
+      const fila = document.createElement('div');
+      fila.className = 'eq' + (total && hay >= total ? ' lleno' : '');
+      fila.innerHTML = '<span class="n"></span><span class="riel"><i></i></span>' +
+                       '<span class="cuenta"></span>';
+      fila.querySelector('.n').textContent = e.nombre;
+      fila.querySelector('.cuenta').textContent = total ? hay + ' de ' + total : String(hay);
+      fila.querySelector('.riel i').style.width =
+        total ? Math.min(100, Math.round(hay / total * 100)) + '%' : '0';
+      caja.appendChild(fila);
+    });
+    /* por si alguien se apuntó con un equipo que no está en el catálogo
+       (por ejemplo si equipos.json no cargó cuando llenó el formulario) */
+    const conocidos = EQUIPOS.map(e => sinAcento(e.nombre));
+    const sueltos = TODOS.filter(p => !conocidos.includes(sinAcento(p.equipo)));
+    if (sueltos.length){
+      const fila = document.createElement('div');
+      fila.className = 'eq';
+      fila.innerHTML = '<span class="n"></span><span class="cuenta"></span>';
+      fila.querySelector('.n').textContent = 'Otros: ' +
+        [...new Set(sueltos.map(p => p.equipo))].join(', ');
+      fila.querySelector('.cuenta').textContent = String(sueltos.length);
+      caja.appendChild(fila);
+    }
+    todo.appendChild(caja);
+  }
 
   /* buscar y bajar */
   const barra = document.createElement('div');
