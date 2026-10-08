@@ -479,8 +479,7 @@ const enPalabras = d => {
        parten y siguen con un espacio al principio. Apple y Google aguantan
        sin esto, Outlook no siempre — y el lugar lo escribe quien pone las
        fechas, así que puede salir largo cualquier día. */
-    const partido = ics.split('
-').map(renglon => {
+    const partido = ics.split('\r\n').map(renglon => {
       const bytes = new TextEncoder().encode(renglon);
       if (bytes.length <= 75) return renglon;
       const trozos = [];
@@ -493,10 +492,8 @@ const enPalabras = d => {
         actual += letra; largo += suma;
       }
       trozos.push(actual);
-      return trozos.join('
- ');
-    }).join('
-');
+      return trozos.join('\r\n ');
+    }).join('\r\n');
 
     const url = URL.createObjectURL(new Blob([partido], { type: 'text/calendar;charset=utf-8' }));
     const a = document.createElement('a');
