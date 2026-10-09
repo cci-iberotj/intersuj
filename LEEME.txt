@@ -53,6 +53,11 @@ Qué trae:
   · botones de WhatsApp y correo de cada quien, para avisarle sin copiar
     nada a mano. El teléfono se guarda como lo escriban; para el enlace se
     dejan sólo los dígitos y se le pone el 52 si vino sin lada de país
+  · un bote de basura para borrar a alguien de la lista. Borra de verdad y
+    no se deshace, así que pregunta con el nombre completo y sólo lo quita
+    de la pantalla CUANDO la base confirma: al revés, un borrado que falló
+    dejaría a alguien fuera de la lista estando apuntado, y nadie lo
+    notaría hasta el día de la grabación
   · buscador por nombre o equipo, que no se pelea con los acentos
   · "Bajar lista (CSV)" para abrirla en Excel o imprimirla. Va con punto y
     coma y con BOM, que es lo que el Excel en español entiende sin que haya
@@ -308,3 +313,20 @@ a 1 de la tarde."
 
 El .ics les aparta las tres horas completas. Es a propósito: no hay hora
 asignada por persona, así que reservar la ventana entera es lo honesto.
+
+
+BORRAR DE LA LISTA (8-oct-2026)
+--------------------------------
+Leo hizo una prueba desde el formulario y quiso limpiarla. La regla de la
+tabla ya permitía borrar con sesión ("quitar apuntados", DELETE, authenticated),
+así que nada más faltaba el botón.
+
+Va al final de los tres, más apagado y separado: es el único que no se
+deshace y no debe quedar pegado a los que se tocan a cada rato.
+
+COMPROBADO simulando las dos respuestas de la base:
+  · cancelar la pregunta no borra NI llama a la red (cero peticiones)
+  · si la base falla, avisa, la persona SIGUE en la lista y el botón se
+    reactiva para volver a intentar
+  · si la base acepta, manda DELETE al folio correcto, la persona desaparece
+    y los contadores se recalculan solos (el de arriba y el del equipo)

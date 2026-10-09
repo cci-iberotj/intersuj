@@ -113,6 +113,12 @@ body{font-family:var(--texto);background:var(--capa-0);color:var(--tinta);line-h
   display:grid;place-items:center;color:var(--tinta-media);text-decoration:none;transition:background .18s,color .18s}
 .persona .toca a:hover{background:var(--rojo);color:#fff}
 .persona .toca svg{width:18px;height:18px;fill:currentColor}
+/* Borrar va separado de los otros dos y más apagado: es el único que no se
+   deshace, así que no debe quedar pegado a los que se tocan a cada rato. */
+.persona .toca .borrar{margin-left:6px;border:0;cursor:pointer;font-family:inherit;
+  background:none;color:#B5ACA3}
+.persona .toca .borrar:hover{background:var(--rojo-hondo);color:#fff}
+.persona .toca .borrar:disabled{opacity:.4;cursor:default}
 
 .vacio{background:var(--papel);border-radius:16px;padding:34px 24px;text-align:center;
   color:var(--tinta-tenue);font-size:16px}
@@ -485,6 +491,15 @@ function renglon(p){
     toca.appendChild(c);
   }
 
+  const basura = document.createElement('button');
+  basura.type = 'button';
+  basura.className = 'borrar';
+  basura.title = 'Borrar de la lista';
+  basura.setAttribute('aria-label', 'Borrar a ' + p.nombre + ' de la lista');
+  basura.innerHTML = '<svg viewBox="0 0 24 24"><path d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>';
+  basura.addEventListener('click', () => quitar(p, basura));
+  toca.appendChild(basura);
+
   fila.append(boton, quien, toca);
   return fila;
 }
@@ -506,6 +521,25 @@ async function marcar(p, boton){
     dibujar();
     if (e.message === 'SIN_SESION') return pedirEntrar();
     alert('No se pudo guardar: ' + e.message);
+  }
+}
+
+/* Borrar es el único botón que no se deshace, así que pregunta con el
+   nombre completo. Se quita de la pantalla hasta que la base confirma: al
+   revés, un borrado que falló dejaría a alguien fuera de la lista estando
+   apuntado, y nadie lo notaría hasta el día de la grabación. */
+async function quitar(p, boton){
+  if (!confirm('¿Borrar a ' + p.nombre + ' de la lista?\n\n' +
+               'Se va su registro completo y no se puede deshacer.')) return;
+  boton.disabled = true;
+  try {
+    await pedir('/' + TABLA + '?folio=eq.' + encodeURIComponent(p.folio), { method: 'DELETE' });
+    TODOS = TODOS.filter(x => x.folio !== p.folio);
+    dibujar();
+  } catch (e){
+    boton.disabled = false;
+    if (e.message === 'SIN_SESION') return pedirEntrar();
+    alert('No se pudo borrar: ' + e.message);
   }
 }
 
