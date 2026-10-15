@@ -484,16 +484,18 @@ function dibujar(){
 const AJUSTES = { coleccion: 'ajustes_intersuj', id: 'mensaje' };
 
 const PLANTILLA_DE_FABRICA =
-  'Hola {nombre}, soy Leo, de Diseño y Medios de la IBERO.\n\n' +
-  'Hoy te toca tu sesión para el video del INTERSUJ: {dia}, {horario}, ' +
+  'Hola {nombre}, soy Leo, de Comunicación de la IBERO.\n\n' +
+  'Tu sesión de foto y video para el INTERSUJ es {dia}, {horario}, ' +
   'en el Aula Magna.\n\n' +
-  'Aquí andamos ya montados, así que llégale cuando puedas dentro de ese ' +
-  'rato; no hace falta avisar.\n\n' +
-  'Te dejo mi contacto por si se te complica la hora o se atraviesa algo: ' +
-  '{yo}. Este número también queda guardado para lo que necesites.\n\n' +
+  'Aquí andamos ya montados. Es rápido: como diez minutos por persona.\n\n' +
+  '¿Me avisas más o menos a qué hora te caes? Nada más para irlos ' +
+  'acomodando y que no hagas cola.\n\n' +
   '¡Nos vemos!';
 
-const CONTACTO_DE_FABRICA = 'leonardo.gonzalez@tijuana.ibero.mx';
+/* Va vacío a propósito. El recado sale por WhatsApp desde su propio
+   número, así que el contacto ya lo tienen: no hay para qué mandarles
+   un correo encima. El campo se queda por si algún día hace falta. */
+const CONTACTO_DE_FABRICA = '';
 
 let Recado = { texto: PLANTILLA_DE_FABRICA, yo: CONTACTO_DE_FABRICA };
 
