@@ -128,6 +128,31 @@ body{font-family:var(--texto);background:var(--capa-0);color:var(--tinta);line-h
   .persona{flex-wrap:wrap}
   .persona .toca{width:100%;justify-content:flex-end}
 }
+
+/* ───────── el editor del recado ───────── */
+.cajon{position:fixed;inset:0;background:rgba(25,23,19,.55);display:flex;
+  align-items:center;justify-content:center;padding:18px;z-index:50}
+.cajon-hoja{background:var(--papel);border-radius:18px;padding:22px;width:100%;
+  max-width:560px;max-height:92vh;overflow:auto;box-shadow:0 18px 50px rgba(0,0,0,.25)}
+.cajon-hoja h2{font-family:var(--titulos);font-size:21px;margin-bottom:16px}
+.cajon-hoja label{display:block;font-size:13px;color:var(--tinta-tenue);
+  text-transform:uppercase;letter-spacing:.07em;font-weight:700;margin:14px 0 6px}
+.cajon-hoja textarea,.cajon-hoja input{width:100%;font:inherit;color:var(--tinta);
+  background:var(--capa-0);border:1px solid var(--linea);border-radius:10px;padding:10px 12px}
+.cajon-hoja textarea{resize:vertical;line-height:1.5}
+.piezas{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.pieza{font:inherit;font-size:12.5px;cursor:pointer;color:var(--rojo-hondo);
+  background:var(--velo);border:0;border-radius:999px;padding:4px 10px}
+.pieza:hover{background:var(--rojo);color:#fff}
+.previa{white-space:pre-wrap;background:var(--capa-0);border:1px dashed var(--linea);
+  border-radius:12px;padding:12px 14px;font-size:14.5px;color:var(--tinta-media)}
+.botones{display:flex;justify-content:flex-end;gap:10px;margin-top:18px}
+.btn,.btn-plano{font:inherit;cursor:pointer;border-radius:10px;padding:9px 16px;border:0}
+.btn{background:var(--rojo-hondo);color:#fff;font-weight:600}
+.btn-plano{background:none;color:var(--tinta-tenue)}
+.editar-recado{font:inherit;font-size:13px;cursor:pointer;background:none;
+  border:1px solid var(--linea);border-radius:999px;padding:4px 12px;color:var(--tinta-media)}
+.editar-recado:hover{border-color:var(--rojo);color:var(--rojo-hondo)}
 </style>
 </head>
 <body>
@@ -306,6 +331,7 @@ async function pintar(){
     todo.innerHTML = '<div class="vacio">No se pudo cargar: ' + e.message + '</div>';
     return;
   }
+  await leerRecado();
   dibujar();
 }
 
@@ -319,7 +345,10 @@ function dibujar(){
   arriba.className = 'arriba';
   arriba.innerHTML = '<div><h1>Lista de grabación</h1>' +
     '<div class="quien">INTERSUJ 2026 · Aula Magna</div></div>' +
-    '<div class="quien"><span></span><button type="button">Salir</button></div>';
+    '<div class="quien"><span></span>' +
+    '<button type="button" class="editar-recado">Mensaje</button>' +
+    '<button type="button">Salir</button></div>';
+  arriba.querySelector('.editar-recado').addEventListener('click', abrirEditor);
   arriba.querySelector('.quien span').textContent = (s && s.correo) || '';
   arriba.querySelector('button').addEventListener('click', () => Sesion.salir());
   todo.appendChild(arriba);
@@ -441,6 +470,177 @@ function dibujar(){
   todo.appendChild(firma);
 }
 
+/* ───────── el mensaje que se les manda ─────────
+   Tocar el icono de WhatsApp ya no abre una conversación en blanco:
+   la abre con el recado escrito y con los datos de ESE atleta --su
+   nombre, su día, su horario--, para no teclear lo mismo veinte
+   veces desde el celular.
+
+   La plantilla NO vive en este archivo: vive en la base, junto a lo
+   demás, para poder corregirla desde el celular en el Aula Magna sin
+   volver a publicar la página. Si la base no contesta se usa la de
+   aquí abajo, que es mejor que quedarse sin nada. */
+
+const AJUSTES = { coleccion: 'ajustes_intersuj', id: 'mensaje' };
+
+const PLANTILLA_DE_FABRICA =
+  'Hola {nombre}, soy Leo, de Diseño y Medios de la IBERO.\n\n' +
+  'Hoy te toca tu sesión para el video del INTERSUJ: {dia}, {horario}, ' +
+  'en el Aula Magna.\n\n' +
+  'Aquí andamos ya montados, así que llégale cuando puedas dentro de ese ' +
+  'rato; no hace falta avisar.\n\n' +
+  'Te dejo mi contacto por si se te complica la hora o se atraviesa algo: ' +
+  '{yo}. Este número también queda guardado para lo que necesites.\n\n' +
+  '¡Nos vemos!';
+
+const CONTACTO_DE_FABRICA = 'leonardo.gonzalez@tijuana.ibero.mx';
+
+let Recado = { texto: PLANTILLA_DE_FABRICA, yo: CONTACTO_DE_FABRICA };
+
+/* Las piezas que se pueden meter al recado. Se enseñan en el editor
+   para no tener que acordarse de cómo se llaman. */
+const PIEZAS = [
+  ['{nombre}',         'nombre de pila'],
+  ['{nombrecompleto}', 'nombre completo'],
+  ['{equipo}',         'su equipo'],
+  ['{dia}',            'jueves 15 de octubre'],
+  ['{horario}',        'de 10:00 a 12:00 h'],
+  ['{desde}',          'hora de inicio'],
+  ['{hasta}',          'hora de término'],
+  ['{yo}',             'tu contacto'],
+];
+
+async function leerRecado(){
+  try {
+    const r = await pedir('/registros?coleccion=eq.' + AJUSTES.coleccion +
+                          '&id=eq.' + AJUSTES.id + '&select=datos');
+    if (r && r[0] && r[0].datos){
+      Recado = {
+        texto: r[0].datos.texto || PLANTILLA_DE_FABRICA,
+        yo:    r[0].datos.yo    || CONTACTO_DE_FABRICA,
+      };
+    }
+  } catch (e){ /* sin recado guardado: queda el de fábrica */ }
+}
+
+async function guardarRecado(){
+  await pedir('/registros', {
+    method: 'POST',
+    headers: { Prefer: 'resolution=merge-duplicates' },
+    body: { coleccion: AJUSTES.coleccion, id: AJUSTES.id,
+            datos: Recado, borrado: false },
+  });
+}
+
+/* El nombre de pila es el primer pedazo. No se intenta adivinar los
+   compuestos --"María Fernanda"-- porque llamarle María a alguien
+   que se dice Fernanda es peor que usar el primero y ya. */
+const dePila = n => (n || '').trim().split(/\s+/)[0] || '';
+
+function armarRecado(p){
+  const desde = p.dia_desde || '';
+  const hasta = p.dia_hasta || '';
+  const horario = desde && hasta ? 'de ' + desde + ' a ' + hasta + ' h'
+                : desde ? 'a partir de las ' + desde + ' h' : 'durante el día';
+  const valores = {
+    '{nombre}':         dePila(p.nombre),
+    '{nombrecompleto}': p.nombre || '',
+    '{equipo}':         p.equipo || '',
+    '{dia}':            p.dia_fecha ? enPalabras(p.dia_fecha) : 'hoy',
+    '{horario}':        horario,
+    '{desde}':          desde,
+    '{hasta}':          hasta,
+    '{yo}':             Recado.yo,
+  };
+  return Recado.texto.replace(/\{[a-zñ]+\}/g, m => (m in valores ? valores[m] : m));
+}
+
+/* ───────── el editor del recado ───────── */
+function abrirEditor(){
+  const fondo = document.createElement('div');
+  fondo.className = 'cajon';
+  fondo.innerHTML =
+    '<div class="cajon-hoja" role="dialog" aria-label="Editar el mensaje">' +
+      '<h2>El mensaje que les llega</h2>' +
+      '<label for="r_texto">El recado</label>' +
+      '<textarea id="r_texto" rows="11"></textarea>' +
+      '<div class="piezas"></div>' +
+      '<label for="r_yo">Tu contacto</label>' +
+      '<input id="r_yo" type="text" placeholder="correo, teléfono, lo que quieras que tengan">' +
+      '<label>Cómo le va a llegar</label>' +
+      '<div class="previa"></div>' +
+      '<div class="botones">' +
+        '<button type="button" class="btn-plano" data-x>Cancelar</button>' +
+        '<button type="button" class="btn" data-ok>Guardar</button>' +
+      '</div>' +
+    '</div>';
+  document.body.appendChild(fondo);
+
+  const texto = fondo.querySelector('#r_texto');
+  const yo    = fondo.querySelector('#r_yo');
+  const previa = fondo.querySelector('.previa');
+  texto.value = Recado.texto;
+  yo.value = Recado.yo;
+
+  /* Las piezas se pegan donde esté el cursor: buscarlas y teclearlas
+     a mano desde el celular no lo haría nadie. */
+  const piezas = fondo.querySelector('.piezas');
+  PIEZAS.forEach(([clave, que]) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'pieza';
+    b.title = que;
+    b.textContent = clave;
+    b.addEventListener('click', () => {
+      const i = texto.selectionStart, j = texto.selectionEnd;
+      texta(texto, texto.value.slice(0, i) + clave + texto.value.slice(j));
+      texto.focus();
+      texto.selectionStart = texto.selectionEnd = i + clave.length;
+      refrescar();
+    });
+    piezas.appendChild(b);
+  });
+  function texta(el, v){ el.value = v; }
+
+  /* La vista previa usa a alguien de verdad de la lista: con nombres
+     inventados no se nota si el recado quedó raro. */
+  const ejemplo = (TODOS.find(x => x.dia_fecha === hoyTexto()) || TODOS[0]);
+  function refrescar(){
+    const antes = { texto: Recado.texto, yo: Recado.yo };
+    Recado = { texto: texto.value, yo: yo.value };
+    previa.textContent = ejemplo ? armarRecado(ejemplo)
+                                 : 'Todavía no hay nadie apuntado para ver cómo queda.';
+    Recado = antes;
+  }
+  texto.addEventListener('input', refrescar);
+  yo.addEventListener('input', refrescar);
+  refrescar();
+
+  const cerrar = () => fondo.remove();
+  fondo.querySelector('[data-x]').addEventListener('click', cerrar);
+  fondo.addEventListener('click', e => { if (e.target === fondo) cerrar(); });
+
+  fondo.querySelector('[data-ok]').addEventListener('click', async e => {
+    const b = e.currentTarget;
+    b.disabled = true; b.textContent = 'Guardando…';
+    Recado = { texto: texto.value, yo: yo.value };
+    try {
+      await guardarRecado();
+      cerrar();
+      dibujar();
+    } catch (err){
+      b.disabled = false; b.textContent = 'Guardar';
+      alert('No se pudo guardar: ' + err.message);
+    }
+  });
+}
+
+const hoyTexto = () => {
+  const d = new Date();
+  const p = n => String(n).padStart(2, '0');
+  return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate());
+};
+
 function renglon(p){
   const fila = document.createElement('div');
   fila.className = 'persona' + (p.estado === 'grabado' ? ' grabado' : '');
@@ -477,16 +677,27 @@ function renglon(p){
   toca.className = 'toca';
   if (digitos){
     const w = document.createElement('a');
+    /* El recado se arma al vuelo, no al pintar: si acabas de cambiar
+       la plantilla, el siguiente que toques ya sale con la nueva. */
     w.href = 'https://wa.me/' + paraWa;
     w.target = '_blank'; w.rel = 'noopener';
-    w.title = 'WhatsApp · ' + p.telefono;
+    w.title = 'Enviar mensaje a ' + dePila(p.nombre) + ' · ' + p.telefono;
+    w.setAttribute('aria-label', 'Enviar mensaje por WhatsApp a ' + p.nombre);
+    w.addEventListener('click', () => {
+      w.href = 'https://wa.me/' + paraWa + '?text=' + encodeURIComponent(armarRecado(p));
+    });
     w.innerHTML = '<svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18a8 8 0 0 1-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1 1 12 20zm4.4-5.8c-.2-.1-1.4-.7-1.6-.8-.2-.1-.4-.1-.5.1l-.7.9c-.1.2-.3.2-.5.1a6.6 6.6 0 0 1-3.2-2.8c-.1-.2 0-.4.1-.5l.4-.5.2-.4v-.4l-.7-1.7c-.2-.4-.4-.4-.5-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.5.6 2.1.6 2.9.5.5 0 1.4-.6 1.6-1.1.2-.6.2-1 .1-1.1l-.6-.1z"/></svg>';
     toca.appendChild(w);
   }
   if (p.correo){
     const c = document.createElement('a');
     c.href = 'mailto:' + p.correo;
-    c.title = p.correo;
+    c.title = 'Enviar el mismo mensaje por correo · ' + p.correo;
+    c.addEventListener('click', () => {
+      c.href = 'mailto:' + p.correo +
+        '?subject=' + encodeURIComponent('Tu sesión para el video del INTERSUJ') +
+        '&body=' + encodeURIComponent(armarRecado(p));
+    });
     c.innerHTML = '<svg viewBox="0 0 24 24"><path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 4.2-8 4.8-8-4.8V6l8 4.8L20 6z"/></svg>';
     toca.appendChild(c);
   }
